@@ -25,7 +25,7 @@ From $ARGUMENTS extract:
 
 3. `feature_slug` — git and file safe slug
    - Lowercase, kebab-case
-   - Only a-z, 0-9 and -
+- Only a-z, 0-9 and -
    - Maximum 40 characters
    - Example: registration, login-logout
 
