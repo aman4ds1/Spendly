@@ -11,6 +11,15 @@ app.secret_key = "dev-secret-key"
 
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+NAV_USERNAME = "Nitish Kumar"
+
+
+@app.context_processor
+def inject_nav_user():
+    if session.get("user_id"):
+        return {"nav_username": NAV_USERNAME}
+    return {}
+
 
 # ------------------------------------------------------------------ #
 # Routes                                                              #
@@ -18,6 +27,8 @@ EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 @app.route("/")
 def landing():
+    if "user_id" in session:
+        return redirect(url_for("profile"))
     return render_template("landing.html")
 
 
@@ -92,7 +103,44 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    user = {
+        "name": NAV_USERNAME,
+        "email": "nitish@example.com",
+        "member_since": "March 2024",
+        "initials": "NK",
+    }
+
+    summary = {
+        "total_spent": 18240,
+        "transaction_count": 34,
+        "top_category": "Food",
+    }
+
+    transactions = [
+        {"date": "2024-06-21", "description": "Swiggy order", "category": "Food", "amount": 540},
+        {"date": "2024-06-20", "description": "Uber to airport", "category": "Travel", "amount": 1250},
+        {"date": "2024-06-18", "description": "Electricity bill", "category": "Bills", "amount": 2100},
+        {"date": "2024-06-15", "description": "Movie tickets", "category": "Entertainment", "amount": 800},
+        {"date": "2024-06-12", "description": "Grocery shopping", "category": "Food", "amount": 1640},
+    ]
+
+    categories = [
+        {"name": "Food", "amount": 7200, "percent": 78, "slug": "food"},
+        {"name": "Travel", "amount": 5100, "percent": 55, "slug": "travel"},
+        {"name": "Bills", "amount": 3400, "percent": 38, "slug": "bills"},
+        {"name": "Entertainment", "amount": 2540, "percent": 28, "slug": "entertainment"},
+    ]
+
+    return render_template(
+        "profile.html",
+        user=user,
+        summary=summary,
+        transactions=transactions,
+        categories=categories,
+    )
 
 
 @app.route("/expenses/add")
