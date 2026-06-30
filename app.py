@@ -1,10 +1,17 @@
 import re
 import sqlite3
+from datetime import date, datetime, timedelta
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, flash, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.queries import (
+    get_user_by_id,
+    get_summary_stats,
+    get_recent_transactions,
+    get_category_breakdown,
+)
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -106,33 +113,48 @@ def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    user = {
-        "name": NAV_USERNAME,
-        "email": "nitish@example.com",
-        "member_since": "March 2024",
-        "initials": "NK",
+    user_id = session["user_id"]
+
+    # --- date-range validation ---
+    raw_from = request.args.get("date_from", "").strip()
+    raw_to = request.args.get("date_to", "").strip()
+    date_from = date_to = None
+    try:
+        if raw_from:
+            date_from = datetime.strptime(raw_from, "%Y-%m-%d").date()
+        if raw_to:
+            date_to = datetime.strptime(raw_to, "%Y-%m-%d").date()
+    except ValueError:
+        date_from = date_to = None
+
+    if date_from and date_to and date_from > date_to:
+        flash("Start date must be before end date.", "error")
+        date_from = date_to = None
+
+    df_str = date_from.isoformat() if date_from else None
+    dt_str = date_to.isoformat() if date_to else None
+
+    # --- preset definitions (computed in Python, passed to template) ---
+    today = date.today()
+    presets = {
+        "this_month": (today.replace(day=1).isoformat(), today.isoformat()),
+        "last_3_months": ((today - timedelta(days=90)).isoformat(), today.isoformat()),
+        "last_6_months": ((today - timedelta(days=180)).isoformat(), today.isoformat()),
+        "all_time": (None, None),
     }
 
-    summary = {
-        "total_spent": 18240,
-        "transaction_count": 34,
-        "top_category": "Food",
-    }
+    active_preset = "all_time" if not df_str and not dt_str else None
+    if active_preset is None:
+        for preset_key, (pf, pt) in presets.items():
+            if df_str == pf and dt_str == pt:
+                active_preset = preset_key
+                break
 
-    transactions = [
-        {"date": "2024-06-21", "description": "Swiggy order", "category": "Food", "amount": 540},
-        {"date": "2024-06-20", "description": "Uber to airport", "category": "Travel", "amount": 1250},
-        {"date": "2024-06-18", "description": "Electricity bill", "category": "Bills", "amount": 2100},
-        {"date": "2024-06-15", "description": "Movie tickets", "category": "Entertainment", "amount": 800},
-        {"date": "2024-06-12", "description": "Grocery shopping", "category": "Food", "amount": 1640},
-    ]
-
-    categories = [
-        {"name": "Food", "amount": 7200, "percent": 78, "slug": "food"},
-        {"name": "Travel", "amount": 5100, "percent": 55, "slug": "travel"},
-        {"name": "Bills", "amount": 3400, "percent": 38, "slug": "bills"},
-        {"name": "Entertainment", "amount": 2540, "percent": 28, "slug": "entertainment"},
-    ]
+    # --- live data ---
+    user = get_user_by_id(user_id)
+    summary = get_summary_stats(user_id, df_str, dt_str)
+    transactions = get_recent_transactions(user_id, date_from=df_str, date_to=dt_str)
+    categories = get_category_breakdown(user_id, df_str, dt_str)
 
     return render_template(
         "profile.html",
@@ -140,6 +162,10 @@ def profile():
         summary=summary,
         transactions=transactions,
         categories=categories,
+        presets=presets,
+        active_preset=active_preset,
+        date_from=df_str,
+        date_to=dt_str,
     )
 
 
