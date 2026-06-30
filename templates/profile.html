@@ -2,6 +2,10 @@
 
 {% block title %}My Profile — Spendly{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <section class="profile-section">
@@ -16,10 +20,44 @@
             </div>
         </div>
 
+        <div class="filter-bar">
+            <div class="filter-presets">
+                <a href="{{ url_for('profile', date_from=presets.this_month[0], date_to=presets.this_month[1]) }}"
+                   class="filter-btn{% if active_preset == 'this_month' %} filter-btn--active{% endif %}">
+                    This Month
+                </a>
+                <a href="{{ url_for('profile', date_from=presets.last_3_months[0], date_to=presets.last_3_months[1]) }}"
+                   class="filter-btn{% if active_preset == 'last_3_months' %} filter-btn--active{% endif %}">
+                    Last 3 Months
+                </a>
+                <a href="{{ url_for('profile', date_from=presets.last_6_months[0], date_to=presets.last_6_months[1]) }}"
+                   class="filter-btn{% if active_preset == 'last_6_months' %} filter-btn--active{% endif %}">
+                    Last 6 Months
+                </a>
+                <a href="{{ url_for('profile') }}"
+                   class="filter-btn{% if active_preset == 'all_time' %} filter-btn--active{% endif %}">
+                    All Time
+                </a>
+            </div>
+
+            <form class="filter-custom" method="get" action="{{ url_for('profile') }}">
+                <input type="date" name="date_from" value="{{ date_from or '' }}" class="filter-date-input">
+                <span class="filter-date-sep">to</span>
+                <input type="date" name="date_to" value="{{ date_to or '' }}" class="filter-date-input">
+                <button type="submit" class="filter-apply-btn">Apply</button>
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="filter-error">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
         <div class="mock-stats profile-stats">
             <div class="mock-stat-card">
                 <span class="mock-stat-label">Total spent</span>
-                <span class="mock-stat-value">₹{{ "{:,}".format(summary.total_spent) }}</span>
+                <span class="mock-stat-value">₹{{ "{:,.2f}".format(summary.total_spent) }}</span>
             </div>
             <div class="mock-stat-card">
                 <span class="mock-stat-label">Transactions</span>
@@ -48,7 +86,11 @@
                         <td>{{ txn.date }}</td>
                         <td>{{ txn.description }}</td>
                         <td><span class="category-badge category-badge--{{ txn.category|lower }}">{{ txn.category }}</span></td>
-                        <td class="profile-table-amount">₹{{ "{:,}".format(txn.amount) }}</td>
+                        <td class="profile-table-amount">₹{{ "{:,.2f}".format(txn.amount) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="filter-empty">No transactions in this period.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -64,8 +106,10 @@
                     <div class="mock-bar-track">
                         <div class="mock-bar bar-fill--{{ cat.slug }}" style="--bar-percent: {{ cat.percent }}%"></div>
                     </div>
-                    <span class="profile-breakdown-amount">₹{{ "{:,}".format(cat.amount) }}</span>
+                    <span class="profile-breakdown-amount">₹{{ "{:,.2f}".format(cat.amount) }}</span>
                 </div>
+                {% else %}
+                <p class="filter-empty">No data for this period.</p>
                 {% endfor %}
             </div>
         </div>
