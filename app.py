@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from flask import Flask, flash, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, add_expense
 from database.queries import (
     get_user_by_id,
     get_summary_stats,
@@ -19,6 +19,8 @@ app.secret_key = "dev-secret-key"
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 NAV_USERNAME = "Nitish Kumar"
+
+EXPENSE_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
 
 
 @app.context_processor
@@ -169,9 +171,53 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
-def add_expense():
-    return "Add expense — coming in Step 7"
+@app.route("/analytics")
+def analytics():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    return render_template("analytics.html")
+
+
+@app.route("/expenses/add", methods=["GET", "POST"])
+def add_expense_view():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template("expenses/add.html", categories=EXPENSE_CATEGORIES, default_date=date.today().isoformat())
+
+    amount_raw = request.form.get("amount", "").strip()
+    category = request.form.get("category", "").strip()
+    date_raw = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip()[:200]
+
+    def rerender(error):
+        return render_template("expenses/add.html", categories=EXPENSE_CATEGORIES,
+                               error=error, amount=amount_raw, category=category,
+                               date=date_raw, description=description)
+
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        return rerender("Amount must be a positive number.")
+
+    if amount <= 0 or amount > 1_000_000:
+        return rerender("Amount must be between 0 and 1,000,000.")
+
+    if category not in EXPENSE_CATEGORIES:
+        return rerender("Please select a valid category.")
+
+    try:
+        parsed_date = datetime.strptime(date_raw, "%Y-%m-%d").date()
+    except ValueError:
+        return rerender("Please enter a valid date.")
+
+    if parsed_date > date.today():
+        return rerender("Date cannot be in the future.")
+
+    add_expense(session["user_id"], amount, category, date_raw, description or None)
+    flash("Expense added successfully.", "success")
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/edit")

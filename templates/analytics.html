@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — Spendly{% endblock %}
+
+{% block content %}
+<section class="analytics-soon-section">
+    <div class="analytics-soon-bg">
+        <div class="analytics-soon-blob analytics-soon-blob--tl"></div>
+        <div class="analytics-soon-blob analytics-soon-blob--br"></div>
+    </div>
+
+    <div class="analytics-soon-card">
+        <!-- decorative corner accents -->
+        <div class="analytics-soon-corner analytics-soon-corner--tr"></div>
+        <div class="analytics-soon-corner analytics-soon-corner--bl"></div>
+
+        <!-- icon -->
+        <div class="analytics-soon-icon-glow"></div>
+        <div class="analytics-soon-icon-wrap">
+            <img src="https://www.figma.com/api/mcp/asset/a01790be-6ada-490a-b98d-5ab50bffcaa6"
+                 alt="Analytics icon"
+                 class="analytics-soon-icon-img">
+        </div>
+        <div class="analytics-soon-icon-shadow"></div>
+
+        <!-- badge -->
+        <div class="analytics-soon-badge">Coming Soon</div>
+
+        <!-- heading -->
+        <h1 class="analytics-soon-heading">Advanced Analytics</h1>
+
+        <!-- body copy -->
+        <p class="analytics-soon-body">
+            We're working on powerful insights and visualizations to help you
+            understand your spending patterns better.
+        </p>
+
+        <!-- progress dots + tagline -->
+        <div class="analytics-soon-footer">
+            <div class="analytics-soon-dots">
+                <span class="analytics-soon-dot analytics-soon-dot--1"></span>
+                <span class="analytics-soon-dot analytics-soon-dot--2"></span>
+                <span class="analytics-soon-dot analytics-soon-dot--3"></span>
+            </div>
+            <p class="analytics-soon-tagline">We're crafting something special</p>
+            <div class="analytics-soon-rule"></div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* ---- layout ---- */
+.analytics-soon-section {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+        155deg,
+        #f5f5f5 0%, #f7f7f7 17%, #f8f8f8 33%,
+        #fafafa 50%, #f6f6f6 60%, #f3f3f3 70%,
+        #efefef 80%, #ececec 90%, #e8e8e8 100%
+    );
+}
+
+/* ---- background blobs ---- */
+.analytics-soon-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.analytics-soon-blob {
+    position: absolute;
+    width: 384px;
+    height: 384px;
+    border-radius: 50%;
+    background: #2d4a3e;
+    opacity: 0.05;
+    filter: blur(64px);
+}
+.analytics-soon-blob--tl { top: -192px; left: -192px; }
+.analytics-soon-blob--br { bottom: -192px; right: -192px; }
+
+/* ---- card ---- */
+.analytics-soon-card {
+    position: relative;
+    background: #fff;
+    border: 0.8px solid #f3f4f6;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.10), 0 8px 20px rgba(0,0,0,0.10);
+    width: 100%;
+    max-width: 512px;
+    padding: 2.5rem 2.55rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* ---- corner accents ---- */
+.analytics-soon-corner {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    opacity: 0.10;
+}
+.analytics-soon-corner--tr {
+    top: 0; right: 0;
+    border-bottom-left-radius: 9999px;
+    background: linear-gradient(135deg, #2d4a3e, transparent);
+}
+.analytics-soon-corner--bl {
+    bottom: 80px; left: 0;
+    border-top-right-radius: 9999px;
+    background: linear-gradient(45deg, #2d4a3e, transparent);
+}
+
+/* ---- icon ---- */
+.analytics-soon-icon-glow {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #2d4a3e;
+    opacity: 0.20;
+    filter: blur(24px);
+    position: absolute;
+    top: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.analytics-soon-icon-wrap {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2d4a3e 0%, #1a2d25 100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
+.analytics-soon-icon-img {
+    width: 48px;
+    height: 48px;
+    display: block;
+}
+.analytics-soon-icon-shadow {
+    width: 128px;
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent, #2d4a3e 50%, transparent);
+    opacity: 0.30;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+/* ---- badge ---- */
+.analytics-soon-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #2d4a3e, #3d5a4e);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+    padding: 0.45rem 1.15rem;
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    margin-bottom: 1.25rem;
+}
+
+/* ---- heading ---- */
+.analytics-soon-heading {
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    line-height: 1.2;
+    background: linear-gradient(90deg, #2d4a3e 0%, #1a2d25 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+/* ---- body ---- */
+.analytics-soon-body {
+    font-size: 1rem;
+    color: #4a5565;
+    line-height: 1.625;
+    max-width: 384px;
+    margin-bottom: 1.5rem;
+}
+
+/* ---- footer ---- */
+.analytics-soon-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ---- dots ---- */
+.analytics-soon-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+.analytics-soon-dot {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #2d4a3e, #3d5a4e);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+}
+.analytics-soon-dot--1 { opacity: 0.61; }
+.analytics-soon-dot--2 { opacity: 0.77; }
+.analytics-soon-dot--3 { opacity: 0.91; }
+
+/* ---- tagline ---- */
+.analytics-soon-tagline {
+    font-size: 0.75rem;
+    color: #99a1af;
+    letter-spacing: 0.02em;
+}
+
+/* ---- bottom rule ---- */
+.analytics-soon-rule {
+    width: 128px;
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent, #2d4a3e 50%, transparent);
+    opacity: 0.30;
+}
+</style>
+{% endblock %}

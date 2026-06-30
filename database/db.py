@@ -49,6 +49,17 @@ def create_user(name, email, password_hash):
     return user_id
 
 
+def add_expense(user_id, amount, category, expense_date, description):
+    conn = get_db()
+    with conn:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, expense_date, description),
+        )
+    conn.close()
+    return cursor.lastrowid
+
+
 def get_user_by_email(email):
     conn = get_db()
     user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
