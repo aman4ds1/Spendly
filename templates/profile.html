@@ -20,6 +20,10 @@
             </div>
         </div>
 
+        <div class="profile-actions">
+            <a href="{{ url_for('add_expense_view') }}" class="btn-add-expense">+ Add Expense</a>
+        </div>
+
         <div class="filter-bar">
             <div class="filter-presets">
                 <a href="{{ url_for('profile', date_from=presets.this_month[0], date_to=presets.this_month[1]) }}"
